@@ -6,15 +6,22 @@ from os import path
 
 class SpiderEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self):
-        mujoco_env.MujocoEnv.__init__(self, path.abspath('./spider.xml'), 5)
+        mujoco_env.MujocoEnv.__init__(self, path.abspath('./spider.xml'), 10)
         utils.EzPickle.__init__(self)
+        self.servo_dict = {14: 5, 8: 6, 2: 7,
+                           13: 9, 7: 10, 1: 11,
+                           18: 13, 12: 14, 6: 15,
+                           17: 18, 11: 17, 5: 16,
+                           16: 22, 10: 21, 4: 20,
+                           15: 26, 9: 25, 3: 24}
 
     def step(self, a):
-        xposbefore = self.get_body_com("spider")[0]
-        self.do_simulation(a, self.frame_skip)
-        xposafter = self.get_body_com("spider")[0]
-
-        forward_reward = (xposafter - xposbefore) / self.dt
+        xpos_before = self.get_body_com("spider")[0]
+        self.sim.data.ctrl[:] = a
+        self.sim.step()
+        xpos_after = self.get_body_com("spider")[0]
+        self.render()
+        forward_reward = (xpos_after - xpos_before) / self.dt
         ctrl_cost = .5 * np.square(a).sum()
         contact_cost = 0.5 * 1e-3 * np.sum(
             np.square(np.clip(self.sim.data.cfrc_ext, -1, 1)))
@@ -32,7 +39,7 @@ class SpiderEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             reward_survive=survive_reward)
 
     def _get_obs(self):
-        return np.concatenate([self.sim.data.ctrl, ])
+        return np.concatenate([self.sim.data.ctrl, self.sim.data.body_xpos[1][:2]])
 
     def reset_model(self):
         qpos = self.init_qpos + self.np_random.uniform(size=self.model.nq, low=-.1, high=.1)
