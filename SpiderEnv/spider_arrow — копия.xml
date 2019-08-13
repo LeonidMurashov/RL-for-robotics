@@ -1,0 +1,177 @@
+<mujoco>
+    <compiler inertiafromgeom="true" angle="degree"/>
+
+    <default>
+        <joint limited="true" damping="1" armature="0"/>
+        <geom condim="1" material="matgeom"/>
+        <position ctrlrange="-.4 .4" ctrllimited="true"/>
+    </default>
+
+    <option timestep="0.005" iterations="50" tolerance="1e-10" solver="Newton" jacobian="dense" cone="pyramidal"/>
+
+    <size nconmax="50" njmax="200" nstack="10000"/>
+
+    <visual>
+        <map force="0.1" zfar="30"/>
+        <rgba haze="0.15 0.25 0.35 1"/>
+        <quality shadowsize="2048"/>
+    </visual>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="512"/> 
+
+        <texture name="texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8"/>  
+
+        <texture name="texgeom" type="cube" builtin="flat" mark="cross" width="127" height="1278" 
+            rgb1="0.8 0.6 0.4" rgb2="0.8 0.6 0.4" markrgb="1 1 1" random="0.01"/>  
+
+        <material name="matplane" reflectance="0.0003" texture="texplane" texrepeat="1 1" texuniform="true"/>
+
+        <material name="matgeom" texture="texgeom" texuniform="true" rgba="0.8 0.6 .4 1"/>
+    </asset>
+
+    <asset>
+        <mesh name="arrow" file="arrow.stl" scale="0.3 0.1 1.5"/>
+
+        <texture name="texarrow" type="cube" builtin="flat" width="127" height="1278" 
+            rgb1="1 1 0" rgb2="1 1 0" markrgb="1 1 1" random="0.01"/>
+        <material name="matarrow" reflectance="0.0003" texture="texarrow" texrepeat="1 1" texuniform="true"/>
+    </asset>
+
+    <worldbody>
+        <geom name="floor" friction="1 1 1" pos="0 0 0" size="0 0 .25" type="plane" material="matplane" condim="3"/>
+
+        <body pos="0 0 2">
+            <joint name="arrow" limited="false" damping="10000" axis="0 0 -1" />
+
+            <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 0 0.27 0" size="0.25 0.25" />
+            <!-- <geom type="mesh" mesh="arrow" material="matarrow"/> -->
+        </body>
+
+        <body name="spider" pos="0 0 1">
+            <camera name="track" mode="trackcom" pos="0 -6 6" euler="45 0 0"/>
+
+            <freejoint name="root"/>
+            <geom mass="3500" type="capsule" fromto="-.766 .6428 0 .766 -.6428 0"  size="0.3 0.3" rgba="0 250 250 1"/>
+            <geom mass="3500" type="capsule" fromto=".766 .6428 0 -.766 -.6428 0"  size="0.3 0.3" rgba="0 250 250 1"/>
+            <geom mass="3500" type="capsule" fromto="0 1 0 0 -1 0"  size="0.3 0.3" rgba="0 250 250 1"/>
+
+            <body name="leg1" pos="0 1 0">
+                <joint name="1"  type="hinge" pos="0 0 0" damping="900" axis="0 0 1" range="-90 90"   />
+                <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 0 0.27 0"  size="0.25 0.25" />
+                <body pos="0 0.27 0">
+                    <joint name="7" type="hinge" pos="0 0 0" damping="900" axis="1 0 0" range="-90 0"    />
+                    <geom friction="000 000 000" type="capsule" rgba="250 229 2 1" fromto="0 0 0 0 0.49 0"  size="0.18 0.18" />
+                    <body pos="0 0.49 0">
+                        <joint name="13" type="hinge" pos="0 0 0" damping="900" axis="1 0 0" range="-90 0"    />
+                        <geom friction="000 0390 000"  type="capsule" rgba="250 0 80 1" fromto="0 0 0 0 0.52 0"  size=".1 .1" />
+                    </body>
+
+                </body>
+            </body>
+
+            <body name="leg4" pos="0 -1 0">
+                <joint name="4" type="hinge" pos="0 0 0" axis="0 0 1" damping="900" range="-90 90"   />
+                <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 0 -.27 0"  size="0.25 0.25" />
+                <body pos="0 -.27 0">
+                    <joint name="10" type="hinge" pos="0 0 0" axis="-1 0 0" damping="900" range="-90 0"   />
+                    <geom friction="000 000 000" type="capsule" rgba="250 229 2 1" fromto="0 0 0 0 -.49 0"  size="0.18 0.18" />
+                    <body pos="0 -.49 0">
+                        <joint name="16" type="hinge" pos="0 0 0" axis="-1 0 0" damping="900" range="-90 0"   />
+                        <geom friction="000 0390 000" type="capsule" rgba="250 0 80 1" fromto="0 0 0 0 -.52 0"  size=".1 .1" />
+                    </body>
+
+                </body>
+            </body>
+
+            <body name="leg2" pos="0.766 0.6428 0">
+                <joint name="2" type="hinge" pos="0 0 0" axis="0 0 1" damping="900" range="-90 90"   />
+                <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 0.204 0.174 0"  size="0.25 0.25" />
+                <body pos=".204 .174 0">
+                    <joint name="8" type="hinge" pos="0 0 0" axis=".5 -.65 0" damping="900" range="-90 0"   />
+                    <geom friction="000 000 000" type="capsule" rgba="250 229 2 1" fromto="0 0 0 .38 .314 0"  size="0.18 0.18" />
+                    <body pos=".38 .314 0">
+                        <joint name="14" type="hinge" pos="0 0 0" axis=".5 -.65 0" damping="900" range="-90 0"   />
+                        <geom friction="000 0390 000" type="capsule" rgba="250 0 80 1" fromto="0 0 0 .4 .34 0"  size=".1 .1" />
+                    </body>
+
+                </body>
+            </body>
+
+            <body name="leg6" pos="-.766 .6428 0">
+                <joint name="6" type="hinge" pos="0 0 0" axis="0 0 1" damping="900" range="-90 90"   />
+                <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 -.204 .174 0"  size="0.25 0.25" />
+                <body pos="-.204 .174 0">
+                    <joint name="12" type="hinge" pos="0 0 0" axis=".5 .65 0" damping="900" range="-90 0"   />
+                    <geom friction="000 000 000" type="capsule" rgba="250 229 2 1" fromto="0 0 0 -.38 .314 0"  size="0.18 0.18" />
+                    <body pos="-.38 .314 0">
+                        <joint name="18" type="hinge" pos="0 0 0" axis=".5 .65 0" damping="900" range="-90 0"   />
+                        <geom friction="000 0390 000" type="capsule" rgba="250 0 80 1" fromto="0 0 0 -.4 .34 0"  size=".1 .1" />
+                    </body>
+
+                </body>
+            </body>
+
+            <body name="leg3" pos=".766 -.6428 0">
+                <joint name="3" type="hinge" pos="0 0 0" axis="0 0 1" damping="900" range="-90 90"   />
+                <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 .204 -.174 0"  size="0.25 0.25" />
+                <body pos=".204 -.174 0">
+                    <joint name="9" type="hinge" pos="0 0 0" axis="-.5 -.65 0" damping="900" range="-90 0"   />
+                    <geom friction="000 000 000" type="capsule" rgba="250 229 2 1" fromto="0 0 0 .38 -.314 0"  size="0.18 0.18" />
+                    <body pos=".38 -.314 0">
+                        <joint name="15" type="hinge" pos="0 0 0" axis="-.5 -.65 0" damping="900" range="-90 0"   />
+                        <geom friction="000 0390 000" type="capsule" rgba="250 0 80 1" fromto="0 0 0 .4 -.34 0"  size=".1 .1" />
+                    </body>
+
+                </body>
+            </body>
+
+            <body name="leg5" pos="-.766 -.6428 0">
+                <joint name="5" type="hinge" pos="0 0 0" axis="0 0 1" range="-90 90" damping="900" />
+                <geom type="capsule" rgba="0 0 0 1" fromto="0 0 0 -.204 -.174 0"  size="0.25 0.25" />
+                <body pos="-.204 -.174 0">
+                    <joint name="11" type="hinge" pos="0 0 0" axis="-.5 .65 0"  damping="900" range="-90 0"   />
+                    <geom friction="000 000 000" type="capsule" rgba="250 229 2 1" fromto="0 0 0 -.38 -.314 0"  size="0.18 0.18" />
+                    <body pos="-.38 -.314 0">
+                        <joint name="17" type="hinge" pos="0 0 0" axis="-.5 .65 0" damping="900" range="-90 0"   />
+                        <geom friction="000 0390 000" type="capsule" rgba="250 0 80 1" fromto="0 0 0 -.4 -.34 0"  size=".1 .1" />
+                    </body>
+
+                </body>
+            </body>
+
+
+
+        </body>
+        
+
+
+
+    </worldbody>
+    <actuator>
+        <position ctrllimited="true" ctrlrange="-180 180" gear="55" kp="50" name="arrow" joint="arrow"/>
+
+        <position ctrllimited="true" ctrlrange="-90 90" gear="55" kp="5" name="g1" joint="1"/>
+        <position ctrllimited="true" ctrlrange="-90 90" gear="55" kp="5" name="g2" joint="2" />
+        <position ctrllimited="true" ctrlrange="-90 90" gear="55" kp="5" name="g3" joint="3" />
+        <position ctrllimited="true" ctrlrange="-90 90" gear="55" kp="5" name="g4" joint="4" />
+        <position ctrllimited="true" ctrlrange="-90 90" gear="55" kp="5" name="g5" joint="5" />
+        <position ctrllimited="true" ctrlrange="-90 90" gear="55" kp="5" name="g6" joint="6" />
+
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g1" joint="7" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g2" joint="8" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g3" joint="9" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g4" joint="10" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g5" joint="11" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g6" joint="12" />
+
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g_g1" joint="13" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g_g2" joint="14" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g_g3" joint="15" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g_g4" joint="16" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g_g5" joint="17" />
+        <position ctrllimited="true" ctrlrange="-90 0" gear="55" kp="5" name="g_g_g6" joint="18" />
+
+
+    </actuator>
+</mujoco>
